@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What's That Sound? — The Ultimate Audio Recognition Game | OASIS Omniverse</title>
+<meta name="description" content="What's That Sound? — the ultimate audio recognition game. Seven brutal difficulty levels from Wussy to God Like! Identify sounds, fill the ring, earn karma. Part of the OASIS Omniverse.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔊</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04060f;
+  --electric:#00d4ff;
+  --electric2:#60eeff;
+  --yellow:#f0e020;
+  --yellow2:#fff060;
+  --purple:#9040f0;
+  --purple2:#b870ff;
+  --green:#20e880;
+  --red:#ff4060;
+  --heading:#e8f4ff;
+  --text:#a8bfd8;
+  --border:rgba(0,212,255,.15);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden}
+
+#starfield{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(4,6,15,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(0,212,255,.1)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center}
+.nav-logo{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;letter-spacing:.08em;color:var(--electric);text-decoration:none;white-space:nowrap}
+.nav-logo span{color:var(--yellow)}
+.nav-links{display:flex;align-items:center;gap:28px;margin-left:36px}
+.nav-links a{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.18em;color:var(--text);text-decoration:none;opacity:.7;transition:opacity .2s,color .2s}
+.nav-links a:hover{opacity:1;color:var(--electric)}
+.nav-right{display:flex;align-items:center;gap:12px;margin-left:auto}
+.nav-cta{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--bg);background:var(--electric);border:none;padding:9px 18px;border-radius:6px;cursor:pointer;text-decoration:none;white-space:nowrap;font-weight:700;transition:background .2s}
+.nav-cta:hover{background:var(--electric2)}
+
+/* HERO */
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;overflow:hidden;z-index:1}
+.hero-bg-glow{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 38%,rgba(0,212,255,.07),transparent 65%),radial-gradient(ellipse 35% 30% at 18% 65%,rgba(144,64,240,.05),transparent 60%),radial-gradient(ellipse 30% 25% at 82% 60%,rgba(240,224,32,.04),transparent 60%);pointer-events:none}
+
+/* Waveform hero */
+.waveform-wrap{width:min(520px,90vw);height:100px;margin:0 auto 36px;position:relative}
+.waveform-svg{width:100%;height:100%}
+@keyframes barPulse{0%,100%{transform:scaleY(.2);opacity:.3}50%{transform:scaleY(1);opacity:1}}
+
+/* Speaker ring */
+.speaker-wrap{width:160px;height:160px;margin:0 auto 28px;position:relative;display:flex;align-items:center;justify-content:center}
+.speaker-ring{position:absolute;border-radius:50%;border:1px solid rgba(0,212,255,.25);animation:speakerPulse 2.4s ease-in-out infinite}
+.speaker-ring:nth-child(1){width:160px;height:160px;animation-delay:0s}
+.speaker-ring:nth-child(2){width:120px;height:120px;border-color:rgba(144,64,240,.2);animation-delay:.3s}
+.speaker-ring:nth-child(3){width:80px;height:80px;border-color:rgba(240,224,32,.2);animation-delay:.6s}
+.speaker-emoji{font-size:52px;position:relative;z-index:1;animation:speakerBounce 2.4s ease-in-out infinite}
+@keyframes speakerPulse{0%,100%{transform:scale(.9);opacity:.4}50%{transform:scale(1.1);opacity:1}}
+@keyframes speakerBounce{0%,100%{transform:scale(.96)}50%{transform:scale(1.04)}}
+
+.hero-eyebrow{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.28em;color:var(--electric);margin-bottom:14px;opacity:.9}
+.hero-title{font-family:'Orbitron',sans-serif;font-size:clamp(32px,6vw,72px);font-weight:900;letter-spacing:.02em;color:var(--heading);line-height:1.0;margin-bottom:8px;text-shadow:0 0 50px rgba(0,212,255,.2)}
+.hero-title em{color:var(--yellow);font-style:normal}
+.hero-qs{font-family:'Orbitron',sans-serif;font-size:clamp(28px,5vw,62px);font-weight:900;color:var(--electric);letter-spacing:.04em;margin-bottom:16px;text-shadow:0 0 30px rgba(0,212,255,.4)}
+.hero-subtitle{font-family:'Share Tech Mono',monospace;font-size:clamp(9px,1.4vw,12px);letter-spacing:.24em;color:var(--yellow);margin-bottom:24px;opacity:.9}
+.hero-desc{font-size:clamp(15px,2.2vw,18px);color:var(--text);max-width:620px;margin:0 auto 36px;line-height:1.8}
+.hero-badges{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:40px}
+.hero-badge{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.18em;padding:6px 14px;border-radius:20px;background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.22);color:var(--electric)}
+.hero-badge.yellow{background:rgba(240,224,32,.07);border-color:rgba(240,224,32,.22);color:var(--yellow)}
+.hero-badge.purple{background:rgba(144,64,240,.07);border-color:rgba(144,64,240,.22);color:var(--purple2)}
+.hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn-primary{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--bg);background:linear-gradient(135deg,var(--electric),#0080a0);border:none;padding:14px 28px;border-radius:8px;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,212,255,.3)}
+.btn-secondary{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--electric);background:transparent;border:1px solid rgba(0,212,255,.3);padding:14px 28px;border-radius:8px;cursor:pointer;text-decoration:none;transition:border-color .2s,background .2s}
+.btn-secondary:hover{border-color:var(--electric);background:rgba(0,212,255,.06)}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease}
+.reveal.visible{opacity:1;transform:none}
+
+/* SECTIONS */
+.section{position:relative;z-index:1;padding:88px 24px}
+.section-kicker{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.26em;color:var(--electric);text-align:center;margin-bottom:14px}
+.section-kicker.yellow{color:var(--yellow)}
+.section-kicker.purple{color:var(--purple2)}
+.section-title{font-family:'Orbitron',sans-serif;font-size:clamp(22px,4vw,40px);font-weight:900;letter-spacing:.06em;color:var(--heading);text-align:center;margin-bottom:10px}
+.section-line{display:block;width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--electric),transparent);margin:0 auto 32px}
+.section-line.yellow{background:linear-gradient(90deg,transparent,var(--yellow),transparent)}
+.section-line.purple{background:linear-gradient(90deg,transparent,var(--purple),transparent)}
+.section-sub{font-size:17px;color:var(--text);text-align:center;max-width:680px;margin:0 auto 52px;line-height:1.75}
+
+/* DIFFICULTY CARDS */
+.diff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(220px,100%),1fr));gap:16px;max-width:1100px;margin:0 auto}
+.diff-card{border-radius:16px;padding:24px 20px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+.diff-card::before{content:'';position:absolute;inset:0;opacity:.06;pointer-events:none}
+.diff-num{font-family:'Orbitron',sans-serif;font-size:42px;font-weight:900;opacity:.12;line-height:1;margin-bottom:8px}
+.diff-icon{font-size:28px;margin-bottom:8px}
+.diff-name{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;margin-bottom:4px;letter-spacing:.06em}
+.diff-pts{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.12em;margin-bottom:10px}
+.diff-desc{font-size:13px;color:var(--text);line-height:1.6}
+.diff-tag{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.18em;padding:3px 10px;border-radius:20px;display:inline-block;margin-top:10px}
+
+/* sound ring game viz */
+.ring-band{background:linear-gradient(135deg,rgba(0,212,255,.04),rgba(144,64,240,.03));border-top:1px solid rgba(0,212,255,.1);border-bottom:1px solid rgba(0,212,255,.1);padding:80px 24px;position:relative;z-index:1;text-align:center}
+.sound-ring-svg{width:260px;height:260px;margin:0 auto 36px;display:block}
+
+/* KARMA BAND */
+.karma-band{background:linear-gradient(135deg,rgba(240,224,32,.04),rgba(144,64,240,.03));border-top:1px solid rgba(240,224,32,.1);border-bottom:1px solid rgba(240,224,32,.1);padding:72px 24px;position:relative;z-index:1}
+.karma-eg-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:36px}
+.karma-eg{background:rgba(240,224,32,.05);border:1px solid rgba(240,224,32,.12);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px}
+.karma-eg-icon{font-size:20px}
+.karma-eg-text{font-size:14px;color:var(--text)}
+.karma-eg-pts{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--yellow);margin-left:auto;white-space:nowrap}
+
+/* OASIS BAND */
+.oasis-band{background:linear-gradient(135deg,rgba(0,212,255,.03),rgba(144,64,240,.02));border-top:1px solid rgba(0,212,255,.08);border-bottom:1px solid rgba(0,212,255,.08);padding:72px 24px;position:relative;z-index:1}
+
+/* PILLS */
+.pill-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:32px}
+.pill{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.18em;padding:7px 16px;border-radius:20px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);color:var(--electric)}
+.pill.yellow{background:rgba(240,224,32,.05);border-color:rgba(240,224,32,.15);color:var(--yellow)}
+.pill.purple{background:rgba(144,64,240,.05);border-color:rgba(144,64,240,.15);color:var(--purple2)}
+
+/* QUOTE */
+.quote-band{padding:64px 24px;position:relative;z-index:1;text-align:center}
+
+/* FOOTER */
+footer{position:relative;z-index:1;background:rgba(4,6,15,.95);border-top:1px solid rgba(0,212,255,.1);padding:48px 24px 36px}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:32px;align-items:start}
+.footer-brand{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;color:var(--electric);letter-spacing:.1em;margin-bottom:10px}
+.footer-sub{font-size:14px;color:#a8bfd8;line-height:1.6;max-width:420px}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap;justify-content:flex-end}
+.footer-links a{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.15em;color:#a8bfd8;text-decoration:none;opacity:.7;transition:opacity .2s,color .2s}
+.footer-links a:hover{opacity:1;color:var(--electric)}
+.footer-copy{text-align:center;font-size:12px;color:#a8bfd8;opacity:.4;margin-top:32px;border-top:1px solid rgba(0,212,255,.07);padding-top:24px}
+
+@media(max-width:700px){.nav-links{display:none}.footer-inner{grid-template-columns:1fr}.footer-links{justify-content:flex-start}}
+@media(max-width:520px){.section{padding:64px .75rem}}
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="https://oasisomniverse.one">WHAT'S THAT <span>SOUND?</span></a>
+    <div class="nav-links">
+      <a href="#levels">LEVELS</a>
+      <a href="#ring">THE RING</a>
+      <a href="#karma">KARMA</a>
+      <a href="#oasis">OASIS</a>
+    </div>
+    <div class="nav-right" id="nav-right">
+      <a class="nav-cta" href="https://oasisomniverse.one">OASIS OMNIVERSE</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-glow"></div>
+
+  <!-- Speaker with pulse rings -->
+  <div class="speaker-wrap">
+    <div class="speaker-ring"></div>
+    <div class="speaker-ring"></div>
+    <div class="speaker-ring"></div>
+    <div class="speaker-emoji">🔊</div>
+  </div>
+
+  <!-- Animated waveform -->
+  <div class="waveform-wrap">
+    <svg class="waveform-svg" viewBox="0 0 520 100" xmlns="http://www.w3.org/2000/svg" id="waveform-svg">
+    </svg>
+  </div>
+
+  <div class="hero-eyebrow">AUDIO RECOGNITION GAME · OASIS OMNIVERSE</div>
+  <h1 class="hero-title">WHAT'S THAT</h1>
+  <div class="hero-qs">SOUND?</div>
+  <div class="hero-subtitle">SEVEN LEVELS · FROM WUSSY TO GOD LIKE! · CAN YOU HANDLE IT?</div>
+  <p class="hero-desc">An audio recognition game with seven brutal difficulty levels. A sound plays. You identify it. Fill the ring to unlock the track and earn karma. Simple. Except when it's played in reverse. At that point, all bets are off.</p>
+
+  <div class="hero-badges">
+    <span class="hero-badge">AUDIO RECOGNITION</span>
+    <span class="hero-badge">7 DIFFICULTY LEVELS</span>
+    <span class="hero-badge yellow">SOUND RING</span>
+    <span class="hero-badge yellow">TRACK UNLOCK</span>
+    <span class="hero-badge purple">EARN KARMA</span>
+    <span class="hero-badge purple">OASIS INTEGRATED</span>
+  </div>
+
+  <div class="hero-actions">
+    <a href="#levels" class="btn-primary">SEE THE LEVELS</a>
+    <a href="https://oasisomniverse.one" target="_blank" class="btn-secondary">OASIS OMNIVERSE</a>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="about" style="background:rgba(255,255,255,.003)">
+  <div class="section-kicker">THE GAME</div>
+  <h2 class="section-title">IDENTIFY THE SOUND. FILL THE RING.</h2>
+  <span class="section-line"></span>
+  <p class="section-sub">The concept is brutally simple. A sound plays. You have to identify it. Every correct answer fills a segment of the Sound Ring. Complete the ring and you unlock the full track — and earn a bonus karma drop.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:20px;max-width:960px;margin:0 auto">
+    <div style="background:linear-gradient(135deg,rgba(0,20,30,.9),rgba(0,8,16,.95));border:1px solid var(--border);border-radius:18px;padding:28px 26px" class="reveal">
+      <div style="font-size:28px;margin-bottom:12px">🎵</div>
+      <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:800;color:var(--heading);margin-bottom:10px">A SOUND PLAYS</div>
+      <p style="font-size:14px;color:var(--text);line-height:1.7">A clip plays — anything from a familiar household object to a field recording from the Amazon to a completely unidentifiable industrial process. The clip length depends on your difficulty level — 10 seconds on Easy, much shorter on the harder tiers.</p>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(0,20,30,.9),rgba(0,8,16,.95));border:1px solid rgba(240,224,32,.18);border-radius:18px;padding:28px 26px" class="reveal">
+      <div style="font-size:28px;margin-bottom:12px">🎯</div>
+      <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:800;color:var(--heading);margin-bottom:10px">YOU IDENTIFY IT</div>
+      <p style="font-size:14px;color:var(--text);line-height:1.7">Type your answer, select from a shortlist or speak it — depending on the mode. On Easy you can pause and replay the clip. On God Like! it plays once, in reverse, and you have ten seconds to answer. Good luck with that.</p>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(0,20,30,.9),rgba(0,8,16,.95));border:1px solid rgba(144,64,240,.18);border-radius:18px;padding:28px 26px" class="reveal">
+      <div style="font-size:28px;margin-bottom:12px">💿</div>
+      <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:800;color:var(--heading);margin-bottom:10px">FILL THE RING</div>
+      <p style="font-size:14px;color:var(--text);line-height:1.7">Every correct answer fills one segment of the Sound Ring — a visualisation that wraps around the current track. Complete the full ring and you unlock the full track to download, earn 1,000 bonus points and a karma drop into your OASIS avatar.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DIFFICULTY LEVELS -->
+<section class="section" id="levels">
+  <div class="section-kicker yellow">THE GAUNTLET</div>
+  <h2 class="section-title">SEVEN LEVELS OF PAIN</h2>
+  <span class="section-line yellow"></span>
+  <p class="section-sub">Pick your difficulty. Or let it pick you.</p>
+
+  <div class="diff-grid">
+
+    <div class="diff-card reveal" style="background:linear-gradient(135deg,rgba(32,232,128,.06),rgba(0,8,4,.95));border-color:rgba(32,232,128,.2)">
+      <div class="diff-num" style="color:var(--green)">01</div>
+      <div class="diff-icon">😌</div>
+      <div class="diff-name" style="color:var(--green)">WUSSY</div>
+      <div class="diff-pts" style="color:var(--green)">STARTS AT 1,000 PTS</div>
+      <div class="diff-desc">10 second clips. You can pause. You can replay. Multiple choice answers. There is no shame in starting here. There is only shame in staying here.</div>
+      <span class="diff-tag" style="background:rgba(32,232,128,.1);border:1px solid rgba(32,232,128,.25);color:var(--green)">EASY</span>
+    </div>
+
+    <div class="diff-card reveal" style="background:linear-gradient(135deg,rgba(0,212,255,.06),rgba(0,6,12,.95));border-color:rgba(0,212,255,.2)">
+      <div class="diff-num" style="color:var(--electric)">02</div>
+      <div class="diff-icon">🙂</div>
+      <div class="diff-name" style="color:var(--electric)">AVERAGE JOE</div>
+      <div class="diff-pts" style="color:var(--electric)">STANDARD SCORING</div>
+      <div class="diff-desc">Shorter clips. One replay allowed. Open text answer. The sounds are less obvious. You will start second-guessing yourself here, and you should.</div>
+      <span class="diff-tag" style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);color:var(--electric)">MEDIUM</span>
+    </div>
+
+    <div class="diff-card reveal" style="background:linear-gradient(135deg,rgba(240,224,32,.05),rgba(6,6,0,.95));border-color:rgba(240,224,32,.2)">
+      <div class="diff-num" style="color:var(--yellow)">03</div>
+      <div class="diff-icon">😤</div>
+      <div class="diff-name" style="color:var(--yellow)">BRAVEHEART</div>
+      <div class="diff-pts" style="color:var(--yellow)">BONUS MULTIPLIER ACTIVE</div>
+      <div class="diff-desc">5 second clips. No replay. No multiple choice. You hear it once and you answer. The library starts pulling from unusual, obscure and frankly unfair sources.</div>
+      <span class="diff-tag" style="background:rgba(240,224,32,.1);border:1px solid rgba(240,224,32,.25);color:var(--yellow)">HARD</span>
+    </div>
+
+    <div class="diff-card reveal" style="background:linear-gradient(135deg,rgba(255,120,0,.05),rgba(10,4,0,.95));border-color:rgba(255,120,0,.2)">
+      <div class="diff-num" style="color:#ff9040">04</div>
+      <div class="diff-icon">😰</div>
+      <div class="diff-name" style="color:#ff9040">VERY HARD</div>
+      <div class="diff-pts" style="color:#ff9040">2× MULTIPLIER</div>
+      <div class="diff-desc">3 second clips. Background noise added. The sounds are obscure, processed or recorded in conditions that make identification genuinely difficult. Most players tap out here.</div>
+      <span class="diff-tag" style="background:rgba(255,120,0,.1);border:1px solid rgba(255,120,0,.25);color:#ff9040">VERY HARD</span>
+    </div>
+
+    <div class="diff-card reveal" style="background:linear-gradient(135deg,rgba(255,64,96,.06),rgba(12,0,4,.95));border-color:rgba(255,64,96,.2)">
+      <div class="diff-num" style="color:var(--red)">05</div>
+      <div class="diff-icon">🤯</div>
+      <div class="diff-name" style="color:var(--red)">SUPER HARDCORE</div>
+      <div class="diff-pts" style="color:var(--red)">3× MULTIPLIER</div>
+      <div class="diff-desc">2 second clips. Heavy processing. Pitch shifted, time-stretched and layered with interference. If you can identify these you either have perfect pitch, superhuman focus or you are cheating.</div>
+      <span class="diff-tag" style="background:rgba(255,64,96,.1);border:1px solid rgba(255,64,96,.25);color:var(--red)">SUPER HARDCORE</span>
+    </div>
+
+    <div class="diff-card reveal" style="background:linear-gradient(135deg,rgba(144,64,240,.07),rgba(6,0,14,.95));border-color:rgba(144,64,240,.25)">
+      <div class="diff-num" style="color:var(--purple2)">06</div>
+      <div class="diff-icon">💀</div>
+      <div class="diff-name" style="color:var(--purple2)">IMPOSSIBLE</div>
+      <div class="diff-pts" style="color:var(--purple2)">5× MULTIPLIER</div>
+      <div class="diff-desc">1 second clips. Maximum distortion. The sounds are field recordings from locations and situations you have almost certainly never encountered. The name is not hyperbole.</div>
+      <span class="diff-tag" style="background:rgba(144,64,240,.1);border:1px solid rgba(144,64,240,.3);color:var(--purple2)">IMPOSSIBLE</span>
+    </div>
+
+    <div class="diff-card reveal" style="background:linear-gradient(135deg,rgba(240,224,32,.08),rgba(144,64,240,.08),rgba(0,212,255,.06));border-color:rgba(240,224,32,.4);box-shadow:0 0 30px rgba(240,224,32,.08)">
+      <div class="diff-num" style="color:var(--yellow)">07</div>
+      <div class="diff-icon">🏆</div>
+      <div class="diff-name" style="background:linear-gradient(135deg,var(--yellow),var(--electric));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">GOD LIKE!</div>
+      <div class="diff-pts" style="color:var(--yellow)">STARTS AT 10,000 PTS · 10× MULTIPLIER</div>
+      <div class="diff-desc">The sounds play IN REVERSE. That's it. That's the level. You have ten seconds to identify a sound you are hearing backwards for the first time in your life. Completing a full ring at God Like! earns a permanent gold aura badge on your OASIS profile.</div>
+      <span class="diff-tag" style="background:linear-gradient(135deg,rgba(240,224,32,.15),rgba(0,212,255,.1));border:1px solid rgba(240,224,32,.4);color:var(--yellow)">⚡ GOD LIKE!</span>
+    </div>
+
+    <div class="diff-card reveal" style="background:linear-gradient(135deg,rgba(0,212,255,.04),rgba(4,6,15,.95));border-color:rgba(0,212,255,.15)">
+      <div class="diff-num" style="color:var(--electric)">✦</div>
+      <div class="diff-icon">⚙️</div>
+      <div class="diff-name" style="color:var(--electric)">CUSTOM</div>
+      <div class="diff-pts" style="color:var(--electric)">FULLY CONFIGURABLE</div>
+      <div class="diff-desc">Set every parameter yourself — clip length, replay count, answer mode, library source, processing type, time limit and scoring rules. Build your own challenge, share it with friends, compete on a custom leaderboard.</div>
+      <span class="diff-tag" style="background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);color:var(--electric)">CUSTOM</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- SOUND RING -->
+<div class="ring-band" id="ring">
+  <div style="max-width:860px;margin:0 auto">
+    <div class="section-kicker" style="text-align:center;margin-bottom:14px">THE MECHANIC</div>
+    <h2 class="section-title">THE SOUND RING</h2>
+    <span class="section-line" style="display:block;width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--electric),transparent);margin:0 auto 32px"></span>
+    <p style="font-size:16px;color:var(--text);max-width:580px;margin:0 auto 44px;line-height:1.75">Every track has a Sound Ring — a circular visualisation of segments, one per sound in that track's library. Identify a sound correctly and its segment lights up. Complete the full ring and the track unlocks.</p>
+
+    <!-- Sound ring SVG -->
+    <svg class="sound-ring-svg reveal" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="segGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <!-- background ring -->
+      <circle cx="130" cy="130" r="100" fill="none" stroke="rgba(0,212,255,.08)" stroke-width="22"/>
+      <!-- filled segments (10 of 16) -->
+      <!-- Each segment is a stroke-dasharray arc on a circle of r=100, circumference=628 -->
+      <!-- 16 segments, each = 628/16 = 39.25px, gap = 3px, so dash = 36.25 3 -->
+      <circle cx="130" cy="130" r="100" fill="none"
+        stroke="rgba(0,212,255,.9)" stroke-width="22"
+        stroke-dasharray="36 3.25"
+        stroke-dashoffset="0"
+        transform="rotate(-90 130 130)"
+        filter="url(#segGlow)"
+        style="animation:ringFill 3s ease-out forwards"/>
+      <!-- 6 unfilled segments shown dimly -->
+      <circle cx="130" cy="130" r="100" fill="none"
+        stroke="rgba(0,212,255,.12)" stroke-width="22"
+        stroke-dasharray="36 3.25"
+        stroke-dashoffset="-393"
+        transform="rotate(-90 130 130)"/>
+      <!-- center -->
+      <circle cx="130" cy="130" r="72" fill="rgba(0,8,20,.8)" stroke="rgba(0,212,255,.12)" stroke-width="1"/>
+      <text x="130" y="118" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="11" font-weight="900" fill="rgba(0,212,255,.9)" letter-spacing="2">TRACK</text>
+      <text x="130" y="136" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="22" font-weight="900" fill="#e8f4ff">10/16</text>
+      <text x="130" y="154" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="9" fill="rgba(240,224,32,.8)" letter-spacing="2">SOUNDS FOUND</text>
+    </svg>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr));gap:16px;max-width:760px;margin:0 auto">
+      <div style="background:linear-gradient(135deg,rgba(0,20,30,.9),rgba(0,8,16,.95));border:1px solid var(--border);border-radius:14px;padding:20px 18px;text-align:left" class="reveal">
+        <div style="font-size:22px;margin-bottom:8px">🔵</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:12px;font-weight:800;color:var(--heading);margin-bottom:6px">FILL IT</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">Each correct answer lights a segment. Wrong answers don't fill — but they don't remove filled segments either. The ring only ever moves forward.</div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(0,20,30,.9),rgba(0,8,16,.95));border:1px solid rgba(240,224,32,.15);border-radius:14px;padding:20px 18px;text-align:left" class="reveal">
+        <div style="font-size:22px;margin-bottom:8px">💿</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:12px;font-weight:800;color:var(--heading);margin-bottom:6px">COMPLETE IT</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">Complete the ring and the full track unlocks to download. 1,000 bonus points drop instantly. A karma reward fires into your OASIS avatar. The ring glows gold.</div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(0,20,30,.9),rgba(0,8,16,.95));border:1px solid rgba(144,64,240,.15);border-radius:14px;padding:20px 18px;text-align:left" class="reveal">
+        <div style="font-size:22px;margin-bottom:8px">🏪</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:12px;font-weight:800;color:var(--heading);margin-bottom:6px">THE SPEAKER SHOP</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">Inside Our World, What's That Sound has a giant animated speaker shop. Walk in, browse tracks by ring completion status, play sounds and compete with players nearby. The shop pulses to whatever's playing.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KARMA BAND -->
+<div class="karma-band" id="karma">
+  <div style="max-width:960px;margin:0 auto;text-align:center">
+    <div class="section-kicker yellow" style="text-align:center;margin-bottom:14px">THE REWARD</div>
+    <h2 class="section-title">YOUR EARS EARN KARMA</h2>
+    <span class="section-line yellow" style="display:block;width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--yellow),transparent);margin:0 auto 20px"></span>
+    <p style="font-size:16px;color:var(--text);max-width:680px;margin:0 auto 8px;line-height:1.75">Every correct answer, every completed ring, every difficulty milestone earns karma that carries directly into your OASIS avatar. The harder the level, the bigger the reward. God Like! completions earn a permanent profile badge.</p>
+
+    <div class="karma-eg-row reveal">
+      <div class="karma-eg"><div class="karma-eg-icon">✅</div><div class="karma-eg-text">Correct identification</div><div class="karma-eg-pts">+5 karma</div></div>
+      <div class="karma-eg"><div class="karma-eg-icon">💿</div><div class="karma-eg-text">Complete a Sound Ring</div><div class="karma-eg-pts">+50 karma</div></div>
+      <div class="karma-eg"><div class="karma-eg-icon">🔥</div><div class="karma-eg-text">10-correct streak</div><div class="karma-eg-pts">+40 karma</div></div>
+      <div class="karma-eg"><div class="karma-eg-icon">💀</div><div class="karma-eg-text">Complete Impossible ring</div><div class="karma-eg-pts">+150 karma</div></div>
+      <div class="karma-eg"><div class="karma-eg-icon">🏆</div><div class="karma-eg-text">Complete God Like! ring</div><div class="karma-eg-pts">+500 karma + gold badge</div></div>
+      <div class="karma-eg"><div class="karma-eg-icon">📅</div><div class="karma-eg-text">Daily challenge completed</div><div class="karma-eg-pts">+30 karma</div></div>
+      <div class="karma-eg"><div class="karma-eg-icon">👥</div><div class="karma-eg-text">Multiplayer round won</div><div class="karma-eg-pts">+25 karma</div></div>
+      <div class="karma-eg"><div class="karma-eg-icon">🎯</div><div class="karma-eg-text">No wrong answers in a round</div><div class="karma-eg-pts">2× multiplier</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ORIGIN STORY -->
+<div style="background:linear-gradient(135deg,rgba(0,212,255,.04),rgba(144,64,240,.03));border-top:1px solid rgba(0,212,255,.1);border-bottom:1px solid rgba(0,212,255,.1);padding:72px 24px;position:relative;z-index:1">
+  <div style="max-width:820px;margin:0 auto">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.26em;color:var(--electric);text-align:center;margin-bottom:14px">THE ORIGIN</div>
+    <h2 style="font-family:'Orbitron',sans-serif;font-size:clamp(20px,3.5vw,34px);font-weight:900;letter-spacing:.06em;color:var(--heading);text-align:center;margin-bottom:10px">BUILT ONCE BEFORE</h2>
+    <span style="display:block;width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--electric),transparent);margin:0 auto 36px"></span>
+    <div class="reveal" style="background:linear-gradient(135deg,rgba(0,20,30,.9),rgba(0,8,16,.95));border:1px solid rgba(0,212,255,.2);border-radius:16px;padding:32px 36px">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.22em;color:var(--electric);margin-bottom:14px">DAVID ELLAMS · 2012</div>
+      <p style="font-size:16px;color:var(--heading);line-height:1.8;margin-bottom:16px">What's That Sound? was first designed and nearly fully built in <strong style="color:var(--electric)">2012</strong> — a Windows 8 Metro app. The Sound Ring idea came directly from the ring segment dial controls David was experimenting with in the Metro UI — he saw the control, immediately knew what it should be used for, and the game was born. The difficulty levels were spec'd out. The ring mechanic worked. It was nearly there.</p>
+      <p style="font-size:16px;color:var(--text);line-height:1.8;margin-bottom:16px">Then his laptop was stolen. All of it — gone. He was more upset about losing the code than the laptop itself. The laptop was replaceable. What's That Sound? wasn't — not easily, and not at that moment. From that point on he backed everything up every night, auto-syncing to his PC and OneDrive. He never lost code like that again.</p>
+      <p style="font-size:16px;color:var(--text);line-height:1.8;margin-bottom:16px">He burned out not long after and was ill for two years from 2013. What's That Sound? never got rebuilt. But like everything else on the list — it was always planned, always <em style="color:var(--electric)">meant to exist</em>.</p>
+      <p style="font-size:16px;color:var(--heading);line-height:1.8">Thirteen years later, the Sound Ring is back. Not as a Windows 8 Metro app but as a full OASIS OAPP — with seven difficulty levels, karma integration, a giant speaker shop inside Our World, and a God Like! mode that plays everything in reverse. Better than the original. Worth every year of the wait.</p>
+    </div>
+  </div>
+</div>
+
+<!-- QUOTE -->
+<div class="quote-band">
+  <div style="max-width:780px;margin:0 auto" class="reveal">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.22em;color:var(--electric);margin-bottom:20px">DAVID ELLAMS — CREATOR</div>
+    <p style="font-size:19px;color:var(--heading);line-height:1.85;font-style:italic;margin-bottom:20px">"The idea was always that the sounds should exist inside Our World too — there's a giant speaker shop in the game where you can walk in and play them. The app and the world feed each other. And yes, there is a level called God Like! where everything plays backwards. It seemed like the only honest name for it."</p>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--text);opacity:.5">PART OF THE OASIS OMNIVERSE</div>
+  </div>
+</div>
+
+<!-- OASIS INTEGRATION -->
+<div class="oasis-band" id="oasis">
+  <div style="max-width:960px;margin:0 auto;text-align:center">
+    <div class="section-kicker" style="text-align:center">OASIS OMNIVERSE</div>
+    <h2 class="section-title">THE SOUND CONNECTS EVERYTHING</h2>
+    <span class="section-line" style="display:block;width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--electric),transparent);margin:0 auto 32px"></span>
+    <p style="font-size:16px;color:var(--text);max-width:680px;margin:0 auto 44px;line-height:1.75">What's That Sound? isn't a standalone game — it's wired into the OASIS ecosystem. Your karma earns here carry across every game. The speaker shop exists inside Our World. And your OASIS mood affects how the game rewards you.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(210px,100%),1fr));gap:16px;max-width:900px;margin:0 auto 40px">
+      <div class="reveal" style="background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.12);border-radius:12px;padding:20px">
+        <div style="font-family:'Orbitron',sans-serif;font-size:12px;font-weight:800;color:var(--heading);margin-bottom:6px">OUR WORLD</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.5">The giant animated speaker shop in Our World sells track unlocks, rings and boosters. Play What's That Sound with players in your area for a local multiplayer mode with massive karma bonuses.</div>
+      </div>
+      <div class="reveal" style="background:rgba(240,224,32,.03);border:1px solid rgba(240,224,32,.12);border-radius:12px;padding:20px">
+        <div style="font-family:'Orbitron',sans-serif;font-size:12px;font-weight:800;color:var(--heading);margin-bottom:6px">BE MINDFUL</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.5">Your Be Mindful mood affects your scoring. Radiant mood = 2× karma on all correct answers. Low mood = calming soundscape mode activates, gentle sounds only, no penalties.</div>
+      </div>
+      <div class="reveal" style="background:rgba(144,64,240,.03);border:1px solid rgba(144,64,240,.12);border-radius:12px;padding:20px">
+        <div style="font-family:'Orbitron',sans-serif;font-size:12px;font-weight:800;color:var(--heading);margin-bottom:6px">MINDFUL CROSSWORDS</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.5">Cross-OAPP challenge: identify a nature sound in What's That Sound and unlock a bonus clue in Mindful Crosswords. Sound and word working together across two OAPPs.</div>
+      </div>
+      <div class="reveal" style="background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.12);border-radius:12px;padding:20px">
+        <div style="font-family:'Orbitron',sans-serif;font-size:12px;font-weight:800;color:var(--heading);margin-bottom:6px">OPORTAL</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.5">Your ring completion stats, difficulty history, total karma earned, personal bests and the God Like! gold badge (if you've earned it) all live in your OPORTAL profile.</div>
+      </div>
+    </div>
+
+    <a href="https://oasisomniverse.one" target="_blank" class="btn-primary" style="display:inline-block">EXPLORE THE OASIS OMNIVERSE</a>
+
+    <div class="pill-row">
+      <span class="pill">Web4 Avatar SSO</span>
+      <span class="pill yellow">OASIS Karma Engine</span>
+      <span class="pill purple">Our World Speaker Shop</span>
+      <span class="pill">Be Mindful Mood Sync</span>
+      <span class="pill yellow">Mindful Crosswords Link</span>
+      <span class="pill purple">Daily Challenges</span>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">WHAT'S THAT SOUND?</div>
+      <p class="footer-sub">The ultimate audio recognition game. Seven brutal difficulty levels from Wussy to God Like! Fill the Sound Ring. Unlock the track. Earn karma. Part of the OASIS Omniverse.</p>
+    </div>
+    <div class="footer-links">
+      <a href="https://oasisomniverse.one" target="_blank">OASIS OMNIVERSE</a>
+      <a href="https://ourworldthegame.com" target="_blank">OUR WORLD</a>
+      <a href="https://bemindful.oasisomniverse.one" target="_blank">BE MINDFUL</a>
+      <a href="https://oportal.oasisomniverse.one" target="_blank">OPORTAL</a>
+    </div>
+  </div>
+  <div class="footer-copy">© 2026 NextGen Software / David Ellams · What's That Sound? · Part of the OASIS Omniverse · All rights reserved</div>
+</footer>
+
+<script type="module">
+try{
+  const{OASISClient}=await import('https://esm.sh/@oasisomniverse/web4-api@2.0.2');
+  const oasis=new OASISClient({baseUrl:'https://api.web4.oasisomniverse.one',persistSession:true});
+  const nr=document.getElementById('nav-right');
+  const btn=document.createElement('button');
+  btn.style.cssText='font-family:"Share Tech Mono",monospace;font-size:10px;letter-spacing:.14em;padding:9px 18px;border-radius:6px;border:1px solid rgba(0,212,255,.4);background:transparent;color:#00d4ff;cursor:pointer;transition:background .2s';
+  const sess=oasis.getSession();
+  const setLabel=s=>{btn.textContent=s?`⬡ ${s.username||'AVATAR'}`:'⬡ CONNECT AVATAR'};
+  setLabel(sess);
+  btn.addEventListener('click',async()=>{
+    if(oasis.getSession()){oasis.logout();setLabel(null);return;}
+    try{const s=await oasis.loginWithSelector();setLabel(s);}catch{}
+  });
+  nr.insertBefore(btn,nr.firstChild);
+}catch{}
+</script>
+
+<script>
+/* STARFIELD */
+(function(){
+  const c=document.getElementById('starfield');
+  const ctx=c.getContext('2d');
+  let W,H,stars=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;stars=Array.from({length:160},()=>({
+    x:Math.random()*W,y:Math.random()*H,
+    r:Math.random()*1.4+.3,
+    o:Math.random()*.6+.1,
+    s:Math.random()*.01+.003,
+    electric:Math.random()<.14,
+    yellow:Math.random()<.05
+  }))}
+  window.addEventListener('resize',resize);resize();
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s=>{
+      s.o+=s.s*(s.d=s.d||1);
+      if(s.o>.85||s.o<.08)s.d*=-1;
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=s.yellow?`rgba(240,224,32,${s.o})`:s.electric?`rgba(0,212,255,${s.o})`:`rgba(180,210,240,${s.o})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* WAVEFORM */
+(function(){
+  const svg=document.getElementById('waveform-svg');
+  if(!svg)return;
+  const W=520,H=100,bars=52,bw=7,gap=3;
+  const colors=['rgba(0,212,255,','rgba(144,64,240,','rgba(240,224,32,'];
+  const els=[];
+  for(let i=0;i<bars;i++){
+    const x=i*(bw+gap)+4;
+    const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    const h=Math.random()*70+10;
+    r.setAttribute('x',x);r.setAttribute('width',bw);r.setAttribute('rx',3);
+    r.setAttribute('y',(H-h)/2);r.setAttribute('height',h);
+    const ci=i%3;
+    r.setAttribute('fill',colors[ci]+(Math.random()*.5+.3)+')');
+    r.style.transformOrigin=`${x+bw/2}px ${H/2}px`;
+    r.style.animation=`barPulse ${(Math.random()*.8+.6).toFixed(2)}s ease-in-out ${(Math.random()*.5).toFixed(2)}s infinite`;
+    svg.appendChild(r);els.push(r);
+  }
+})();
+
+/* SCROLL REVEAL */
+(function(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+})();
+</script>
+</body>
+</html>
